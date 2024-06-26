@@ -10,7 +10,65 @@
     </head>
     <body class="bg">
 
+        <div id="preloader">
+            <div class="preloader-underlay"></div>
+            <div class="preloader-overlay"></div>
+            <video autoplay muted class="preloader-vid" oncontextmenu="return false;">
+                <source src="{% static 'media/preloader.mp4' %}" type="video/mp4">
+            </video>
+        </div>
+
         {% block content %} {% endblock %}
 
     </body>
+
+    <script>
+        
+        let timeoutReached = false;
+        let videoHasEnded = false;
+
+        const video = document.querySelector('.preloader-vid');
+        
+        // function ensureVideoPlays() {
+        //     if (video.paused) {
+        //         video.play().catch(e => console.error("Error attempting to play video: ", e));
+        //     }
+        // }
+
+        // document.addEventListener('visibilitychange', ensureVideoPlays);
+        // setInterval(ensureVideoPlays, 1); // Check every milisecond
+
+        setTimeout(function(){
+            timeoutReached = true;
+            hidePreloaderIfReady();
+        }, 3000);
+
+        function onVideoEnded() {
+            videoHasEnded = true;
+            console.log('GIF Ended!');
+            hidePreloaderIfReady();
+            video.play();
+            // setTimeout(function() {
+            //     video.play();
+            // }, 100);
+        }
+
+        function onVideoPlay() {
+            videoHasEnded = false; // Reset to false when a new iteration begins
+            console.log('GIF Started!');
+        }
+
+        function hidePreloaderIfReady() {
+            if (timeoutReached && videoHasEnded) {
+                document.getElementById('preloader').style.display = 'none';
+                video.removeEventListener('ended', onVideoEnded);
+                video.removeEventListener('play', onVideoPlay);
+            }
+        }
+
+        video.addEventListener('ended', onVideoEnded);
+        video.addEventListener('play', onVideoPlay);
+
+    </script>
+
 </html>
